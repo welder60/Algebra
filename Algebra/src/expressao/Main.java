@@ -1,7 +1,5 @@
 package expressao;
 
-import java.util.Random;
-
 import swing.JanelaPrincipal;
 
 public class Main {
