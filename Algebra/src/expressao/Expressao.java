@@ -1,18 +1,16 @@
 package expressao;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Expressao {
+	protected boolean marcada;
 	protected static final int ESCALA = 50;
 	
-	protected List<Expressao> valores;
-	protected List<Expressao> parametros;
+	private List<Expressao> valores;
 	
 	protected Expressao() {
 		this.valores = new LinkedList<Expressao>();
-		this.parametros = new LinkedList<Expressao>();
 	}	
 	
 	public Expressao(String... valores) {
@@ -24,12 +22,32 @@ public abstract class Expressao {
 	
 	public Expressao(Expressao... valores) {
 		this();
-		this.valores.addAll(Arrays.asList(valores));
+		for (Expressao atual : valores) {
+			this.valores.add(atual.copia());
+		}
 	}
 	
+	
+	
 	public abstract Double getValorDecimal(Variavel...variaveis);
-	public abstract String getLatex(Variavel...variaveis);
+	protected abstract void getLatex(StringBuilder sb,Variavel...variaveis);
 	public abstract String toString(Variavel...variaveis);
+	public abstract Expressao copia();
+	
+	public String getLatex(Variavel...variaveis) {
+		StringBuilder sb = new StringBuilder();
+		if(marcada) {
+			sb.append(" \\textcolor{red}{ ");
+		}
+		
+		getLatex(sb, variaveis);
+		
+		if(marcada) {
+			sb.append(" } ");
+		}
+		
+		return sb.toString();
+	}
 	
 	public Expressao getValor(Variavel...variaveis) {
 		if (isInteiro(variaveis)) return new Valor(getValorDecimal(variaveis));
@@ -37,7 +55,12 @@ public abstract class Expressao {
 	}
 	
 	public boolean isDesprezivel(Variavel...variaveis) {
-		return Math.abs(getValorDecimal(variaveis))<1e-5;
+		try {
+			return Math.abs(getValorDecimal(variaveis))<1e-5;
+		} catch(ArithmeticException e) {
+			return false;
+		}
+		
 	}
 	
 	public abstract Expressao getValorComponentes(Variavel...variaveis);
@@ -59,6 +82,26 @@ public abstract class Expressao {
 		}
 	}
 	
+	public void substituir(Expressao anterior,Expressao nova) {
+		int substituir = -1;
+		for (int i = 0; i < valores.size(); i++) {
+			Expressao expressao = valores.get(i);
+			if(expressao == anterior) {
+				substituir = i;
+				break;
+			}
+		}
+		
+		if(substituir>=0) {
+			valores.set(substituir, nova);
+			return;
+		}
+		
+		for (Expressao expressao : valores) {
+			expressao.substituir(anterior, nova);
+		}
+	}
+	
 	
 	//public abstract Expressao derivada();
 	//public abstract Expressao limite();
@@ -66,9 +109,54 @@ public abstract class Expressao {
 		return Math.abs(getValorDecimal(variaveis) - b.getValorDecimal(variaveis))<1e-9;		
 	}
 	
+	protected Expressao valor(int i) {
+		return valores.get(i);
+	}
+	
+	protected Expressao[] valores() {
+		return valores.toArray(new Expressao[valores.size()]);
+	}
+	
+	public List<Expressao> listarExpressoes() {
+		List<Expressao> lista = new LinkedList<Expressao>();
+		for (Expressao expressao : valores) {
+			lista.addAll(expressao.listarExpressoes());
+		}
+		if (!isValor()) {
+	        lista.add(this);
+	    }
+		return lista;
+	}
+	
+	public void marcar() {
+		marcada = true;
+	}
+	
+	public void desmarcar() {
+		marcada = false;
+		for (Expressao expressao : valores) {
+			expressao.desmarcar();
+		}
+	}
+	
+	protected boolean isValor() {
+		return this instanceof Valor;
+	}
+	
+	
+	
+	
 	@Override
 	public String toString() {
 		return toString(new Variavel[0]);
+	}
+
+	public boolean isNegativa(Variavel... variaveis) {
+		try {
+			return getValorDecimal(variaveis)<0d;
+		} catch(ArithmeticException e) {
+			return false;
+		}
 	}
 	
 	

@@ -1,7 +1,5 @@
 package expressao;
 
-import java.util.Stack;
-
 public class Parser {
 
     public static Expressao parse(String texto) {
@@ -24,9 +22,9 @@ public class Parser {
             	
             	switch(c) {
             	case '+':
-            		return new Soma(parseExpressao(str.substring(0, i)), parseExpressao(str.substring(i + 1)));
+            		return new Adicao(parseExpressao(str.substring(0, i)), parseExpressao(str.substring(i + 1)));
             	case '-':
-            		return new Subtracao(parseExpressao(str.substring(0, i)), parseExpressao(str.substring(i + 1)));
+            		return new Adicao(parseExpressao(str.substring(0, i)), parseExpressao(str.substring(i + 1)));
             	case '*':
             		return new Multiplicacao(parseExpressao(str.substring(0, i)), parseExpressao(str.substring(i + 1)));
             	case '/':

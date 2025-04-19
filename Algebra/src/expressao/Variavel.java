@@ -58,7 +58,6 @@ public class Variavel {
         }
 
         Double intervalo = valorMaximo - valorMinimo;
-        Double escala = Math.max(valorMinimo, valorMaximo);
 
         Double fatorAleatorio = new Double(random .nextDouble());
         Double resultado = valorMinimo + (intervalo*fatorAleatorio);

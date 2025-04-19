@@ -13,22 +13,24 @@ public class Limite extends Expressao{
 
 	@Override
 	public Double getValorDecimal(Variavel... variaveis) {
-		return valores.get(0).getValorDecimal(new Variavel(variavel,limite));
+		return valor(0).getValorDecimal(new Variavel(variavel,limite));
 	}
 
 	@Override
-	public String getLatex(Variavel...variaveis) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("\\lim_{").append(variavel).append(" \\to ").append(limite.getLatex()).append("} ");
-		sb.append(valores.get(0).getLatex(variaveis));
-		return sb.toString();
+	protected void getLatex(StringBuilder sb,Variavel...variaveis) {
+		sb.append("\\lim_{").append(variavel).append(" \\to ");
+		limite.getLatex(sb);
+		sb.append("} ");
+		valor(0).getLatex(sb,variaveis);
 	}
 
 	@Override
 	public String toString(Variavel...variaveis) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\\lim_{").append(variavel).append(" \\to ").append(limite.getLatex(variaveis)).append("} ");
-		sb.append(valores.get(0));
+		sb.append("\\lim_{").append(variavel).append(" \\to ");
+		limite.getLatex(sb,variaveis);
+		sb.append("} ");
+		sb.append(valor(0));
 		return sb.toString();
 	}
 
@@ -42,6 +44,11 @@ public class Limite extends Expressao{
 	public Expressao getDerivada(Variavel... variaveis) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Expressao copia() {
+		return new Limite(variavel,valor(0));
 	}
 	
 

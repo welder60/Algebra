@@ -10,10 +10,10 @@ public class SomaIndexada extends Expressao {
 	private int iFinal;
 
 	public SomaIndexada(char variavel,int iInicial,int iFinal,Expressao expressao) {
+		super(expressao);
 		this.variavel = variavel;
 		this.iInicial = iInicial;
 		this.iFinal = iFinal;
-		valores.add(expressao);
 	}
 	
 	public SomaIndexada(char variavel,int iFinal,Expressao expressao) {
@@ -30,18 +30,16 @@ public class SomaIndexada extends Expressao {
 	}
 
 	@Override
-	public String getLatex(Variavel... variaveis) {
-		StringBuilder sb = new StringBuilder();
+	protected void getLatex(StringBuilder sb,Variavel... variaveis) {
 		sb.append("\\sum_{");
 		sb.append(variavel).append('=').append(iInicial).append("}");
 		sb.append("^{").append(iFinal).append("} ");
 		boolean primeiro = true;
-		for (Expressao expressao : valores) {
+		for (Expressao expressao : valores()) {
 			if(!primeiro)sb.append("+");
-			sb.append(expressao.getLatex(variaveis));
+			expressao.getLatex(sb,variaveis);
 			primeiro = false;			
 		}
-		return sb.toString();
 	}
 
 	@Override
@@ -50,7 +48,7 @@ public class SomaIndexada extends Expressao {
 		sb.append("Σ").append(iInicial).append('-').append(iFinal);
 		sb.append("(");
 		boolean primeiro = true;
-		for (Expressao expressao : valores) {
+		for (Expressao expressao : valores()) {
 			if(!primeiro)sb.append("+");
 			sb.append(expressao.toString(variaveis));
 			primeiro = false;			
@@ -67,10 +65,10 @@ public class SomaIndexada extends Expressao {
 		Expressao[] valores = new Expressao[n];
 		for (int i = 0; i < n; i++) {
 			variaveisNovas[variaveis.length] = new Variavel(variavel,new Valor((iInicial+i)+""));
-			valores[i] = this.valores.get(0).getValor(variaveisNovas);			
+			valores[i] = valor(0).getValor(variaveisNovas);			
 		}
 		
-		Expressao valor = new Soma(valores);
+		Expressao valor = new Adicao(valores);
 		System.out.println(valor);
 		return valor;
 		
@@ -80,6 +78,11 @@ public class SomaIndexada extends Expressao {
 	public Expressao getDerivada(Variavel... variaveis) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Expressao copia() {
+		return new SomaIndexada(variavel, iInicial, iFinal, valor(0));
 	}
 
 }

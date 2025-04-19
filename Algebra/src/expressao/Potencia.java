@@ -15,8 +15,7 @@ public class Potencia extends Expressao {
 	}
 	
 	public Potencia(Expressao base,Expressao expoente) {
-		super(base);
-		parametros.add(expoente);
+		super(base,expoente);
 	}
 	
 	public Potencia(Expressao valor) {
@@ -25,8 +24,8 @@ public class Potencia extends Expressao {
 
 	@Override
 	public Double getValorDecimal(Variavel... variaveis) {
-		Double base = valores.get(0).getValorDecimal(variaveis);
-		Double expoente = parametros.get(0).getValorDecimal(variaveis);
+		Double base = valor(0).getValorDecimal(variaveis);
+		Double expoente = valor(1).getValorDecimal(variaveis);
 		
 		if(expoente==Double.POSITIVE_INFINITY) {
 			if(Math.abs(base)<1) return 0d;
@@ -38,32 +37,40 @@ public class Potencia extends Expressao {
 	}
 
 	@Override
-	public String getLatex(Variavel... variaveis) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(valores.get(0).getLatex(variaveis)).append("^{").append(parametros.get(0).getLatex(variaveis)).append("}");
-		return sb.toString();
+	protected void getLatex(StringBuilder sb,Variavel... variaveis) {
+		if(!valor(0).isValor()) sb.append(" \\left( ");	
+		valor(0).getLatex(sb,variaveis);
+		if(!valor(0).isValor()) sb.append(" \\right) ");
+		sb.append("^{");			
+		valor(1).getLatex(sb,variaveis);		
+		sb.append("}");
 	}
 
 	@Override
 	public String toString(Variavel... variaveis) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
-		sb.append(valores.get(0).toString(variaveis));
+		sb.append(valor(0).toString(variaveis));
 		sb.append("^");
-		sb.append(parametros.get(0).toString(variaveis));
+		sb.append(valor(1).toString(variaveis));
 		sb.append(")");
 		return sb.toString();
 	}
 
 	@Override
 	public Expressao getValorComponentes(Variavel... variaveis) {
-		return new Potencia(valores.get(0).getValor(variaveis), parametros.get(0).getValor(variaveis));
+		return new Potencia(valor(0).getValor(variaveis), valor(1).getValor(variaveis));
 	}
 
 	@Override
 	public Expressao getDerivada(Variavel... variaveis) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Expressao copia() {
+		return new Potencia(valor(0),valor(1));
 	}
 
 }

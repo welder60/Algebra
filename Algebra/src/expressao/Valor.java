@@ -19,11 +19,11 @@ public class Valor extends Expressao {
 	}
 
 	@Override
-	public String getLatex(Variavel... variaveis) {	
-		if(isVariavel(variaveis)) return variavel+"";
-		if(getValorDecimal(variaveis)==Double.POSITIVE_INFINITY) return "\\infty";
-		if(getValorDecimal(variaveis)==Double.NEGATIVE_INFINITY) return "-\\infty";
-		return formatarDouble(getValorDecimal(variaveis));
+	protected void getLatex(StringBuilder sb,Variavel... variaveis) {	
+		if(isVariavel(variaveis)) {sb.append(variavel+"");return;}
+		if(getValorDecimal(variaveis)==Double.POSITIVE_INFINITY) { sb.append("\\infty");return;}
+		if(getValorDecimal(variaveis)==Double.NEGATIVE_INFINITY) { sb.append("-\\infty");return;}
+		sb.append(formatarDouble(getValorDecimal(variaveis)));
 	}
 
 	@Override
@@ -70,6 +70,12 @@ public class Valor extends Expressao {
 	@Override
 	public Expressao getValorComponentes(Variavel... variaveis) {
 		return getValor(variaveis);
+	}
+
+	@Override
+	public Expressao copia() {
+		if(variavel>0)return new Valor(variavel);
+		return new Valor(valor);
 	}
 
 	

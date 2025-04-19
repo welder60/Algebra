@@ -18,12 +18,12 @@ public class PainelLatex extends JPanel {
 
     public PainelLatex() {
         setBackground(Color.WHITE);
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                copiarParaAreaDeTransferencia();
-            }
-        });
+//        addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent e) {
+//                copiarParaAreaDeTransferencia();
+//            }
+//        });
     }
 
     public void setExpressaoLatex(String latex) {

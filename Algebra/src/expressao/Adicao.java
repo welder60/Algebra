@@ -1,45 +1,35 @@
 package expressao;
 
 import java.util.LinkedList;
-import java.util.function.Predicate;
 
-public class Soma extends Expressao {
+public class Adicao extends Expressao {
 	
-	public Soma(String... valores) {
+	public Adicao(String... valores) {
 		super(valores);
 	}
 	
-	public Soma(Expressao... valores) {
+	public Adicao(Expressao... valores) {
 		super(valores);
-		this.valores.removeIf(new Predicate<Expressao>() {
-
-			@Override
-			public boolean test(Expressao t) {
-				return t.isDesprezivel();
-			}
-		}) ;
 	}
 
 	@Override
 	public Double getValorDecimal(Variavel... variaveis) {
 		Double total = 0d;
-		for (Expressao expressao : valores) {
+		for (Expressao expressao : valores()) {
 			total += expressao.getValorDecimal(variaveis);
 		}
 		return new Valor(total).getValorDecimal();
 	}
 
 	@Override
-	public String getLatex(Variavel... variaveis) {
-		StringBuilder sb = new StringBuilder();
+	protected void getLatex(StringBuilder sb,Variavel... variaveis) {
 		boolean primeiro = true;
-		for (Expressao expressao : valores) {
+		for (Expressao expressao : valores()) {
 			if(expressao.isDesprezivel(variaveis))continue;
 			if(!primeiro)sb.append("+");
-			sb.append(expressao.getLatex(variaveis));
+			expressao.getLatex(sb,variaveis);
 			primeiro = false;			
 		}
-		return sb.toString();
 	}
 
 	@Override
@@ -47,10 +37,11 @@ public class Soma extends Expressao {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		boolean primeiro = true;
-		for (Expressao expressao : valores) {
-			if(expressao.isDesprezivel(variaveis))continue;
-			//if(!primeiro)sb.append("+");
-			//sb.append(expressao.toString(variaveis));
+		for (Expressao expressao : valores()) {
+			if(!primeiro && !expressao.isNegativa())sb.append("+");			
+			if(!expressao.isValor()) sb.append(" \\left( ");		
+			sb.append(expressao.toString(variaveis));
+			if(!expressao.isValor()) sb.append(" \\right) ");	
 			primeiro = false;			
 		}
 		sb.append(")");
@@ -73,7 +64,7 @@ public class Soma extends Expressao {
 	public Expressao getValorComponentes(Variavel... variaveis) {
 		double valor = 0d;
 		LinkedList<Expressao> valores = new LinkedList<Expressao>();
-		for (Expressao expressao : this.valores) {
+		for (Expressao expressao : valores()) {
 			if(!expressao.isInteiro(variaveis)) {
 				valores.add(expressao.getValor(variaveis));
 			} else {
@@ -82,8 +73,13 @@ public class Soma extends Expressao {
 		}
 		valores.addFirst(new Valor(valor));
 		if(valores.size()==1) return valores.get(0).getValor(variaveis);
-		return new Soma(valores.toArray(new Expressao[valores.size()]));		
+		return new Adicao(valores.toArray(new Expressao[valores.size()]));		
 		
+	}
+
+	@Override
+	public Expressao copia() {
+		return new Adicao(valores());
 	}
 
 
